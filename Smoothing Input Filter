@@ -1,100 +1,99 @@
 #include "Servo.h"
-#define MAX_ANALOG_INPUT_VAL 1023
 
-const int servo_pin1 = 9;  
-const int servo_pin2 = 8;
-const int servo_pin3 = 7;
-const int servo_pin4 = 6;
+int servo_pin1 = 9;  
+int servo_pin2 = 8;
+int servo_pin3 = 7;
+int servo_pin4 = 6;
 
-const int potpin1 = A0;
-const int potpin2 = A1;
-const int potpin3 = A2;
-const int potpin4 = A3;
-
-// Define the number of samples to keep track of. The higher the number, the
-// more the readings will be smoothed, but the slower the output will respond to
-// the input. Using a constant rather than a normal variable lets us use this
-// value to determine the size of the readings array.
-const int SMOOTHING_WINDOW_SIZE = 20; // 10 samples
-
-int _samples[SMOOTHING_WINDOW_SIZE];  // the readings from the analog input
-int _curReadIndex = 0;                // the index of the current reading
-int _sampleTotal = 0;                 // the running total
-int _sampleAvg = 0;                   // the average
-
+int potpin1 = A0;
+int potpin2 = A1;
+int potpin3 = A2;
+int potpin4 = A3;
+ 
 Servo Servo1;
 Servo Servo2;
 Servo Servo3;
 Servo Servo4;
 int val;
 
+const int numReadings = 10;
+int readings_1[numReadings];  // the readings from the analog input
+int readIndex = 0;          // the index of the current reading
+int total_1 = 0;              // the running total
+int average_1 = 0;            // the average
 
+int readings_2[numReadings];  // the readings from the analog input    
+int total_2 = 0;              // the running total
+int average_2 = 0;            // the average
+
+int readings_3[numReadings];  // the readings from the analog input
+int total_3 = 0;              // the running total
+int average_3 = 0;            // the average
+
+int readings_4[numReadings];  // the readings from the analog input
+int total_4 = 0;              // the running total
+int average_4 = 0;            // the average
+ 
 void setup() {
-  
   Serial.begin(9600);
   Servo1.attach(servo_pin1);
   Servo2.attach(servo_pin2);
   Servo3.attach(servo_pin3);
   Servo4.attach(servo_pin4);
-
-  // initialize all the readings to 0:
-  for (int i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
-    _samples[i] = 0;}
-  
-}
-
-void loop() {
-
-  // subtract the last reading:
-  _sampleTotal = _sampleTotal - _samples[_curReadIndex];
-  
-  // read the sensor value
-  int sensorVal1 = analogRead(potpin1);
-  int sensorVal2 = analogRead(potpin2);
-  int sensorVal3 = analogRead(potpin3);
-  int sensorVal4 = analogRead(potpin4);
-  _samples[_curReadIndex] = sensorVal1;
-  _samples[_curReadIndex] = sensorVal2;
-  _samples[_curReadIndex] = sensorVal3;
-  _samples[_curReadIndex] = sensorVal4;
-  
-  // add the reading to the total:
-  _sampleTotal = _sampleTotal + _samples[_curReadIndex];
-  
-  
-  // advance to the next position in the array:
-  _curReadIndex = _curReadIndex + 1;
-
-  // if we're at the end of the array...
-  if (_curReadIndex >= SMOOTHING_WINDOW_SIZE) {
-    // ...wrap around to the beginning:
-    _curReadIndex = 0;
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings_1[thisReading] = 0;
   }
-
-  // calculate the average:
-  _sampleAvg = _sampleTotal / SMOOTHING_WINDOW_SIZE;
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings_2[thisReading] = 0;
+  }
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings_3[thisReading] = 0;
+  }
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings_4[thisReading] = 0;
+  }
+}
+ 
+void loop() {
   
-  // set the LED brightness to the smoothed value
-  int val1 = map(_sampleAvg, 0, MAX_ANALOG_INPUT_VAL, 1, 179);
-    Servo1.write(val1);
-
-  int val2 = map(_sampleAvg, 0, MAX_ANALOG_INPUT_VAL, 1, 179);
-    Servo2.write(val2);
-
-  int val3 = map(_sampleAvg, 0, MAX_ANALOG_INPUT_VAL, 1, 179);
-    Servo3.write(val3);
-
-  int val4 = map(_sampleAvg, 0, MAX_ANALOG_INPUT_VAL, 1, 179);
-    Servo4.write(val4);
+  total_1 = total_1 - readings_1[readIndex];
+  readings_1[readIndex] = map(analogRead(potpin1), 0, 1023, 1, 179);
+  total_1 = total_1 + readings_1[readIndex];  
+  average_1 = total_1 / numReadings;
+  Servo1.write(average_1);
+  delay(15);
+  //Serial.println(val);
   
-  //analogWrite(servo_pin1, val);
+  total_2 = total_2 - readings_2[readIndex];
+  readings_2[readIndex] = map(analogRead(potpin2), 0, 1023, 1, 179);
+  total_2 = total_2 + readings_2[readIndex];  
+  average_2 = total_2 / numReadings;
+  Servo2.write(average_2);
+  delay(15);
+  //Serial.println(val);
+  
+  total_3 = total_3 - readings_3[readIndex];
+  readings_3[readIndex] = map(analogRead(potpin3), 0, 1023, 1, 179);
+  total_3 = total_3 + readings_3[readIndex];  
+  average_3 = total_3 / numReadings;
+  Servo3.write(average_3);
+  delay(15);
+  //Serial.println(val);
+  
+  total_4 = total_4 - readings_4[readIndex];
+  readings_4[readIndex] = map(analogRead(potpin4), 0, 1023, 1, 179);
+  total_4 = total_4 + readings_4[readIndex];  
+  average_4 = total_4 / numReadings;
+  Servo4.write(average_4);
+  delay(15);
+  //Serial.println(val);
 
-  // print the raw pot value and the converted led value
-  Serial.print("AnalogIn:");
-  Serial.print(sensorVal1);
-  Serial.print(", ");
-  Serial.print("Smoothed:");
-  Serial.println(_sampleAvg);
-
-  delay(50);
+  
+  readIndex = readIndex + 1;
+  
+  // if we're at the end of the array...
+  if (readIndex >= numReadings) {
+    // ...wrap around to the beginning:
+    readIndex = 0;
+  }
 }
