@@ -15,8 +15,8 @@ Servo Servo2;
 Servo Servo3;
 Servo Servo4;
 int val;
-
-const int numReadings = 10;   // adding smoothing input filter:
+                              // adding smoothing input filter:
+const int numReadings = 10;   // defining that every 10th reading will get used
 int readings_1[numReadings];  // the readings from the analog input
 int readIndex = 0;            // the index of the current reading
 int total_1 = 0;              // the running total
